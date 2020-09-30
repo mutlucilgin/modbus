@@ -23,6 +23,7 @@ public class modbus {
 
 class MyTimerTask extends TimerTask {
     static int num = 0;
+    
     static HSSFWorkbook workbook;
     static HSSFSheet sheet;
     int counter = 1;
