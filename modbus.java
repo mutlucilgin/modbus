@@ -11,7 +11,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 
 public class modbus {
-    static int period = 200; // "num" değerinin artma periyodu
+    static int period = 200; // "num" değerinin artma periyodu "ms"
 
     public static void main(String[] args) throws IOException {
 
@@ -29,8 +29,8 @@ class MyTimerTask extends TimerTask {
     static int num = 0;                         // modbus'a ait holding register adresinde bulunacak olan veri
     int counter = 1;                            // her periyotta çalışan metodun toplam çalışma
     int countLoop = 0;                          // tekrar eden döngü sayısı
-    int stopLoop = 5;                           // tekrar edecek toplam döngü sayısı
-    int max_num = 5;                            // "num" sayısının çıkabileceği max değer(Bu değere ulaştıktan sonra "num"
+    int stopLoop = 10;                           // tekrar edecek toplam döngü sayısı
+    int max_num = 100;                            // "num" sayısının çıkabileceği max değer(Bu değere ulaştıktan sonra "num"
                                                 // sayısı sıfırlanmaktadır.)
 
     ModbusServer modbusServer = new ModbusServer();             // oluşturulan modbus server
