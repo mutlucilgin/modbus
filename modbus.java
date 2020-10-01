@@ -9,7 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 
 public class modbus {
-    static int period=200;
+    static int period=200;              // "num" değerinin artma periyodu
     public static void main(String[] args) throws IOException {
 
         Timer timer = new Timer();
@@ -17,7 +17,6 @@ public class modbus {
 
         timer.schedule(task, 0, period);
         System.out.println("TimerTask started");
-
     }
 }
 
@@ -27,8 +26,8 @@ class MyTimerTask extends TimerTask {
     static int num = 0;                 // modbus'a ait holding register adresinde bulunacak olan veri
     int counter = 1;                    // her periyotta çalışan metodun toplam çalışma 
     int countLoop=0;                    // tekrar eden döngü sayısı 
-    int stopLoop = 10;                  // tekrar edecek toplam döngü sayısı
-    int max_num =100;                   // "num" sayısının çıkabileceği max değer(Bu değere ulaştıktan sonra "num" sayısı sıfırlanmaktadır.)
+    int stopLoop = 2;                  // tekrar edecek toplam döngü sayısı
+    int max_num =5;                   // "num" sayısının çıkabileceği max değer(Bu değere ulaştıktan sonra "num" sayısı sıfırlanmaktadır.)
 
     ModbusServer modbusServer = new ModbusServer();  // oluşturulan modbus server
     static Timer myTimer;
@@ -46,6 +45,7 @@ class MyTimerTask extends TimerTask {
 
             //modbusServer.coils[1] = true;
             modbusServer.Listen();
+            System.out.println("listening start");
         } catch (IOException e) {
 
             e.printStackTrace();
@@ -57,7 +57,7 @@ class MyTimerTask extends TimerTask {
         Date date = new Date();
         SimpleDateFormat DateFor = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
         String stringDate = DateFor.format(date);
-
+        
         System.out.println(" Time = " + stringDate + "    value = " + num);
         modbusServer.holdingRegisters[1] = num;                                 //modbus server'a ait holding register adresine veri yerleştiriliyor
         modbusServer.holdingRegisters[2] = num;
@@ -81,6 +81,8 @@ class MyTimerTask extends TimerTask {
                 FileOutputStream out = new FileOutputStream(new File("data.xls"));
                 workbook.write(out);
                 workbook.close();
+                System.out.println("kapandı");
+                modbusServer.StopListening();
                 System.out.println("kapandı");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
