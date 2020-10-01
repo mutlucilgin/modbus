@@ -9,7 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 
 public class modbus {
-    static int period=1000;
+    static int period=200;
     public static void main(String[] args) throws IOException {
 
         Timer timer = new Timer();
@@ -22,11 +22,15 @@ public class modbus {
 }
 
 class MyTimerTask extends TimerTask {
-    static int num = 0;
     static HSSFWorkbook workbook;
     static HSSFSheet sheet;
-    int counter = 1;
-    ModbusServer modbusServer = new ModbusServer();
+    static int num = 0;                 // modbus'a ait holding register adresinde bulunacak olan veri
+    int counter = 1;                    // her periyotta çalışan metodun toplam çalışma 
+    int countLoop=0;                    // tekrar eden döngü sayısı 
+    int stopLoop = 10;                  // tekrar edecek toplam döngü sayısı
+    int max_num =100;                   // "num" sayısının çıkabileceği max değer(Bu değere ulaştıktan sonra "num" sayısı sıfırlanmaktadır.)
+
+    ModbusServer modbusServer = new ModbusServer();  // oluşturulan modbus server
     static Timer myTimer;
     MyTimerTask(Timer timer) {
         myTimer=timer;
@@ -40,7 +44,7 @@ class MyTimerTask extends TimerTask {
             cell = row.createCell(1);
             cell.setCellValue("Value");
 
-            modbusServer.coils[1] = true;
+            //modbusServer.coils[1] = true;
             modbusServer.Listen();
         } catch (IOException e) {
 
@@ -55,17 +59,23 @@ class MyTimerTask extends TimerTask {
         String stringDate = DateFor.format(date);
 
         System.out.println(" Time = " + stringDate + "    value = " + num);
-        modbusServer.holdingRegisters[1] = num;
+        modbusServer.holdingRegisters[1] = num;                                 //modbus server'a ait holding register adresine veri yerleştiriliyor
         modbusServer.holdingRegisters[2] = num;
         modbusServer.holdingRegisters[3] = num;
 
+        // holding register adresinde bulunan num değeri, her periyotta zamanı ile birlikte excel dosyasına yazdırılmaktadır.
         HSSFRow row = sheet.createRow(counter);
         Cell cell = row.createCell(0);
         cell.setCellValue(stringDate);
         cell = row.createCell(1);
         cell.setCellValue(num);
+        if(counter>=max_num){
+            num=0;
+            counter=0;
+            countLoop++;
+        }
         counter++;
-        if (counter > 300) {
+        if (countLoop >= stopLoop) {
             try {
 
                 FileOutputStream out = new FileOutputStream(new File("data.xls"));
