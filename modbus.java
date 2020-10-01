@@ -76,30 +76,29 @@ class MyTimerTask extends TimerTask {
         cell.setCellValue(stringDate);
         cell = row.createCell(1);
         cell.setCellValue(num);
-        if (counter >= max_num) {
+        if (num >= max_num) {
             num = 0;
-            counter = 0;
+            if (countLoop >= stopLoop) {
+                try {
+                    
+                    FileOutputStream out = new FileOutputStream(new File("data.xls"));
+                    workbook.write(out);
+                    workbook.close();
+                    System.out.println(" Excel oluştu. Program bitmiştir");
+                    modbusServer.StopListening();
+                    client.Connect();               // Neden bilmiyorum StopListening yapınca program sonlanmıyor ama bu şekilde
+                    // yeni bir
+                    // bağlantı oluşunca kendini kapatıyor.
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                myTimer.cancel();
+                return;
+            }
             countLoop++;
         }
         counter++;
-        if (countLoop >= stopLoop) {
-            try {
-
-                FileOutputStream out = new FileOutputStream(new File("data.xls"));
-                workbook.write(out);
-                workbook.close();
-                System.out.println("kapandı");
-                modbusServer.StopListening();
-                client.Connect();               // Neden bilmiyorum StopListening yapınca program sonlanmıyor ama bu şekilde
-                                                // yeni bir
-                                                // bağlantı oluşunca kendini kapatıyor.
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            myTimer.cancel();
-            return;
-        }
     }
 }
